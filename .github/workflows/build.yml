@@ -24,9 +24,13 @@ jobs:
           gradle-version: 8.9
 
       - name: Build debug APK
-        run: gradle assembleDebug --no-daemon
+        run: |
+          SETTINGS=$(find . -name settings.gradle.kts -not -path './.git/*' | head -n1)
+          if [ -z "$SETTINGS" ]; then echo "settings.gradle.kts nao encontrado"; ls -R; exit 1; fi
+          cd "$(dirname "$SETTINGS")"
+          gradle assembleDebug --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: MinimalLauncher-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: "**/build/outputs/apk/debug/*.apk"
